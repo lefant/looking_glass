@@ -1,0 +1,32 @@
+.chart div {
+    font: 10px sans-serif;
+    background-color: steelblue;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+}
+
+.table {
+    width: 300px;
+}
+
+.table td {
+    font: 10px sans-serif;
+    background-color: steelblue;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+    min-width: 40px;
+    overflow: hidden;
+}
+
+.ok {
+  background: #B8F1BC; }
+
+.warning {
+  background: #F7D18E; }
+
+.critical {
+  background: #FF3C43; }
