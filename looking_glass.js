@@ -101,17 +101,13 @@ var path = sankey.link();
 
         var links = svg_link_g.selectAll(".link")
             .data(graph.links, function(d) { return d.key })
-        links.enter().append("path").call(render_link);
+        links.enter().append("path").attr("class", "link").call(render_link);
         links.call(render_link);
-
         function render_link() {
-            console.log('render_link: ', this);
             this
-                .attr("class", "link")
                 .attr("d", path)
                 .style("stroke-width",
                        function(d) { return Math.max(1, d.dy); });
-            //.sort(function(a, b) { return b.dy - a.dy; });
         };
 
         var node = svg_node_g.selectAll(".node")
