@@ -38,10 +38,7 @@ var path = sankey.link();
     };
 
     looking_glass.render = function() {
-        var indexData = [];
-        for (var key in index) {
-            indexData.push(index[key]);
-        };
+        var indexData = _.values(index);
 
         var t = tbody.selectAll("div").data(indexData);
         var rows = tbody.selectAll("tr")
