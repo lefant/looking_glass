@@ -115,7 +115,10 @@ var path = sankey.link();
             .attr("transform", function(d) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
-        nodes.enter().append("g").attr("class", "node");
+        nodes.enter().append("g").attr("class", "node")
+            .attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
 
         var rects = nodes.selectAll("rect")
             .data(function(d) { return [d] },
