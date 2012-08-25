@@ -99,10 +99,20 @@ var path = sankey.link();
             .links(graph.links)
             .layout(32);
 
-        var link = svg_link_g.selectAll(".link")
+        var links = svg_link_g.selectAll(".link")
             .data(graph.links, function(d) { return d.key })
-        link.enter().append("path").call(render_link);
-        link.selectAll("path").call(render_link);
+        links.enter().append("path").call(render_link);
+        links.call(render_link);
+
+        function render_link() {
+            console.log('render_link: ', this);
+            this
+                .attr("class", "link")
+                .attr("d", path)
+                .style("stroke-width",
+                       function(d) { return Math.max(1, d.dy); });
+            //.sort(function(a, b) { return b.dy - a.dy; });
+        };
 
         var node = svg_node_g.selectAll(".node")
             .data(graph.nodes, function(d) { return d.id })
@@ -115,13 +125,6 @@ var path = sankey.link();
         node.append("text").call(render_node_text);
     };
 
-    function render_link() {
-        this
-            .attr("class", "link")
-            .attr("d", path)
-            .style("stroke-width", function(d) { return Math.max(1, d.dy); });
-            //.sort(function(a, b) { return b.dy - a.dy; });
-    };
 
     function render_node_rect() {
         this
