@@ -136,9 +136,8 @@ var path = sankey.link();
                 .style("fill", function(d) {
                     return d.color = color(d.name.replace(/ .*/, ""));
                 })
-                .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
-                .append("title")
-                .text(function(d) { return d.name + "\n" + format(d.value); });
+                .style("stroke",
+                       function(d) { return d3.rgb(d.color).darker(2); });
         };
         function render_node_text() {
             this
