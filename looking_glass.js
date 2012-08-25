@@ -20,7 +20,6 @@ var path = sankey.link();
     };
 
     var index = {};
-
     var tbody;
 
     looking_glass.init = function(chart0) {
@@ -75,17 +74,21 @@ var path = sankey.link();
     };
 
 
-    var svg;
+    var svg_link_g;
+    var svg_node_g;
     var nodes = {};
     var edges = {};
     var max_id = 0;
 
     looking_glass.init_flow = function(svg0) {
-        svg = d3.select("#chart").append("svg")
+        var svg = d3.select("#chart").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+        svg_link_g = svg.append("g");
+        svg_node_g = svg.append("g");
     };
 
     looking_glass.render_flow = function () {
@@ -96,29 +99,32 @@ var path = sankey.link();
             .links(graph.links)
             .layout(32);
 
-        // remove elements from previous run
-        svg.selectAll("path").remove();
-        svg.selectAll("link").remove();
-        svg.selectAll("rect").remove();
-        svg.selectAll("text").remove();
-
-        var link = svg.append("g").selectAll(".link")
+        var link = svg_link_g.selectAll(".link")
             .data(graph.links, function(d) { return d.key })
-        link.enter().append("path")
-            .attr("class", "link")
-            .attr("d", path)
-            .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-            .sort(function(a, b) { return b.dy - a.dy; });
+        link.enter().append("path").call(render_link);
+        link.selectAll("path").call(render_link);
 
-
-        var node = svg.append("g").selectAll(".node")
+        var node = svg_node_g.selectAll(".node")
             .data(graph.nodes, function(d) { return d.id })
             .enter().append("g")
             .attr("class", "node")
             .attr("transform", function(d) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
-        node.append("rect")
+        node.append("rect").call(render_node_rect);
+        node.append("text").call(render_node_text);
+    };
+
+    function render_link() {
+        this
+            .attr("class", "link")
+            .attr("d", path)
+            .style("stroke-width", function(d) { return Math.max(1, d.dy); });
+            //.sort(function(a, b) { return b.dy - a.dy; });
+    };
+
+    function render_node_rect() {
+        this
             .attr("height", function(d) { return d.dy; })
             .attr("width", sankey.nodeWidth())
             .style("fill", function(d) {
@@ -127,7 +133,9 @@ var path = sankey.link();
             .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
             .append("title")
             .text(function(d) { return d.name + "\n" + format(d.value); });
-        node.append("text")
+    };
+    function render_node_text() {
+        this
             .attr("x", -6)
             .attr("y", function(d) { return d.dy / 2; })
             .attr("dy", ".35em")
