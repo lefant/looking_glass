@@ -19,7 +19,7 @@
   //looking_glass.init_flow(d3.select("#chart"));
 
   var host = "nisse.lefant.net:5556";
-  looking_glass.subscribe(host, 'host =~ "%icebox%"', function(event) {
+  looking_glass.subscribe(host, 'host =~ "%"', function(event) {
     var key = event.host + '+' + event.service;
     //var value = event.state + '+' + event.metric;
     var value = event.metric;
