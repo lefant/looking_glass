@@ -102,7 +102,7 @@ var path = sankey.link();
         var links = svg_link_g.selectAll(".link")
             .data(graph.links, function(d) { return d.key })
         links.enter().append("path").attr("class", "link").call(render_link);
-        links.call(render_link);
+        links.transition().call(render_link);
         function render_link() {
             this
                 .attr("d", path)
@@ -121,7 +121,7 @@ var path = sankey.link();
             .data(function(d) { return [d] },
                   function(d) { return d.id });
         rects.enter().append("rect").call(render_node_rect);
-        rects.call(render_node_rect);
+        rects.transition().call(render_node_rect);
 
         var texts = nodes.selectAll("text")
             .data(function(d) { return [d] },
