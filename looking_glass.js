@@ -57,7 +57,7 @@ var path = sankey.link();
             });
         cells.enter().append("td");
         var bars = cells.selectAll("div")
-            .data(function(d) { return [d]; })
+            .data(function(d) { return [d]; });
         bars.enter().append("div").call(render_div)
         bars.transition().call(render_div)
 
@@ -110,15 +110,24 @@ var path = sankey.link();
                        function(d) { return Math.max(1, d.dy); });
         };
 
-        var node = svg_node_g.selectAll(".node")
+        var nodes = svg_node_g.selectAll(".node")
             .data(graph.nodes, function(d) { return d.id })
-            .enter().append("g")
-            .attr("class", "node")
             .attr("transform", function(d) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
-        node.append("rect").call(render_node_rect);
-        node.append("text").call(render_node_text);
+        nodes.enter().append("g").attr("class", "node");
+
+        var rects = nodes.selectAll("rect")
+            .data(function(d) { return [d] },
+                  function(d) { return d.id });
+        rects.enter().append("rect").call(render_node_rect);
+        rects.call(render_node_rect);
+
+        var texts = nodes.selectAll("text")
+            .data(function(d) { return [d] },
+                  function(d) { return d.id });
+        texts.enter().append("text").call(render_node_text);
+        texts.call(render_node_text);
 
         function render_node_rect() {
             this
