@@ -119,31 +119,31 @@ var path = sankey.link();
             });
         node.append("rect").call(render_node_rect);
         node.append("text").call(render_node_text);
-    };
 
+        function render_node_rect() {
+            this
+                .attr("height", function(d) { return d.dy; })
+                .attr("width", sankey.nodeWidth())
+                .style("fill", function(d) {
+                    return d.color = color(d.name.replace(/ .*/, ""));
+                })
+                .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+                .append("title")
+                .text(function(d) { return d.name + "\n" + format(d.value); });
+        };
+        function render_node_text() {
+            this
+                .attr("x", -6)
+                .attr("y", function(d) { return d.dy / 2; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", "end")
+                .attr("transform", null)
+                .text(function(d) { return d.name; })
+                .filter(function(d) { return d.x < width / 2; })
+                .attr("x", 6 + sankey.nodeWidth())
+                .attr("text-anchor", "start");
+        };
 
-    function render_node_rect() {
-        this
-            .attr("height", function(d) { return d.dy; })
-            .attr("width", sankey.nodeWidth())
-            .style("fill", function(d) {
-                return d.color = color(d.name.replace(/ .*/, ""));
-            })
-            .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
-            .append("title")
-            .text(function(d) { return d.name + "\n" + format(d.value); });
-    };
-    function render_node_text() {
-        this
-            .attr("x", -6)
-            .attr("y", function(d) { return d.dy / 2; })
-            .attr("dy", ".35em")
-            .attr("text-anchor", "end")
-            .attr("transform", null)
-            .text(function(d) { return d.name; })
-            .filter(function(d) { return d.x < width / 2; })
-            .attr("x", 6 + sankey.nodeWidth())
-            .attr("text-anchor", "start");
     };
 
     function subscribe_common(host, query, handler) {
