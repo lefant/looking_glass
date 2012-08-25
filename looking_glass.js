@@ -1,3 +1,17 @@
+var margin = {top: 1, right: 1, bottom: 6, left: 1},
+width = 960 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+var formatNumber = d3.format(",.0f"),
+format = function(d) { return formatNumber(d) + " lines"; },
+color = d3.scale.category20();
+
+var sankey = d3.sankey()
+    .nodeWidth(15)
+    .nodePadding(10)
+    .size([width, height]);
+var path = sankey.link();
+
+
 (function() {
      console.log('looking_glass initializing...');
 
@@ -6,14 +20,14 @@
      };
 
      var index = {};
-     //var indexData = [];
-     var chart;
+
      var tbody;
 
      looking_glass.init = function(chart0) {
-         chart = chart0.append("div").attr("class", "chart");
-         var table = chart0.append("table").attr("class", "table"),
-             thead = table.append("thead");
+         var table = chart0.append("table")
+             .attr("class", "table")
+             .style("width", "300px");
+             thead = table.append("thead")
          tbody = table.append("tbody");
 
          thead.append("tr")
@@ -24,52 +38,142 @@
              .text(function(column) { return column; });
      };
 
-     function redraw() {
+     looking_glass.render = function() {
          var indexData = [];
          for (var key in index) {
              indexData.push(index[key]);
          };
 
-         var s = chart.selectAll("div").data(indexData);
-         //console.log('redraw: ', s.enter(), s.transition(), s.exit());
-         s.enter()
-             .append("div")
-             .style("width", function(d) { return 300 + d.value * 500 + "px"; })
-             .text(function(d) { return d.key + ' ' + d.value; });
-         s.transition()
-             .duration(1000)
-             .style("width", function(d) { return 300 + d.value * 500 + "px"; })
-             .text(function(d) { return d.key + ' ' + d.value; });
-         s.exit().remove();
-
          var t = tbody.selectAll("div").data(indexData);
-         // create a row for each object in the data
          var rows = tbody.selectAll("tr")
              .data(indexData)
-             .enter()
-             .append("tr");
+         rows.enter().append("tr");
 
-         // create a cell in each row for each column
          var cells = rows.selectAll("td")
              .data(function(row) {
-                       return ['key', 'value'].map(
-                           function(column) {
-                               return {column: column, value: row[column]};
-                           });
-                   });
-         cells.enter()
-             .append("td")
-             .text(function(d) { return d.value; })
-             .append("div")
-             .style("width", function(d) { return d.value * 100 + "%"; });
-         cells.transition()
-             .duration(1000)
-             .text(function(d) { return d.value; })
-             .style("width", function(d) { return d.value * 100 + "%"; });
+                 return ['key', 'value'].map(
+                     function(column) {
+                         return {column: column, value: row[column]};
+                     });
+             });
+         cells.enter().append("td");
+         var bars = cells.selectAll("div")
+             .data(function(d) { return [d]; })
+         bars.enter().append("div").call(render_div)
+         bars.transition().call(render_div)
+
+         function render_div() {
+             this
+                 .text(function(d) { return d.value; })
+                 .filter(function(d) { return d.column == 'value'; })
+                 .attr("class", "ok")
+                 .style("width", function(d) { return d.value * 100 + "px"; });
+         };
+
          cells.exit().remove();
+         bars.exit().remove();
+     };
+
+
+    var svg;
+    var nodes = {};
+    var edges = {};
+    var max_id = 0;
+
+    looking_glass.init_flow = function(svg0) {
+        svg = d3.select("#chart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    };
+
+     looking_glass.render_flow = function () {
+         var graph = to_lists();
+
+         sankey
+             .nodes(graph.nodes)
+             .links(graph.links)
+             .layout(32);
+
+         // remove elements from previous run
+         svg.selectAll("path").remove();
+         svg.selectAll("link").remove();
+         svg.selectAll("rect").remove();
+         svg.selectAll("text").remove();
+
+         var link = svg.append("g").selectAll(".link")
+             .data(graph.links)
+             .enter().append("path")
+             .attr("class", "link")
+             .attr("d", path)
+             .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+             .sort(function(a, b) { return b.dy - a.dy; });
+
+         link.append("title")
+             .text(function(d) {
+                 return d.source.name + " → " + d.target.name + "\n" + format(d.value);
+             });
+
+         var node = svg.append("g").selectAll(".node")
+             .data(graph.nodes)
+             .enter().append("g")
+             .attr("class", "node")
+             .attr("transform", function(d) {
+                 return "translate(" + d.x + "," + d.y + ")";
+             });
+
+         node.append("rect")
+             .attr("height", function(d) { return d.dy; })
+             .attr("width", sankey.nodeWidth())
+             .style("fill", function(d) {
+                 return d.color = color(d.name.replace(/ .*/, ""));
+             })
+             .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+             .append("title")
+             .text(function(d) { return d.name + "\n" + format(d.value); });
+
+         node.append("text")
+             .attr("x", -6)
+             .attr("y", function(d) { return d.dy / 2; })
+             .attr("dy", ".35em")
+             .attr("text-anchor", "end")
+             .attr("transform", null)
+             .text(function(d) { return d.name; })
+             .filter(function(d) { return d.x < width / 2; })
+             .attr("x", 6 + sankey.nodeWidth())
+             .attr("text-anchor", "start");
      };
 
      looking_glass.subscribe = function (host, query, handler) {
+         subscribe_common(host, query, function(json) {
+             var item = handler(json);
+             index[item.key] = item;
+             //redraw();
+         });
+     };
+
+     looking_glass.subscribe_flow = function (host, query, handler) {
+         subscribe_common(host, query, function(json) {
+             var item = handler(json);
+             if (! item) {
+                 return;
+             };
+
+             ensure_id(item.source);
+             ensure_id(item.target);
+             var source_id = nodes[item.source].id;
+             var target_id = nodes[item.target].id;
+
+             var key = [source_id, target_id];
+             //var key = [item.source, item.target];
+             edges[key] = {"source": source_id,
+                           "target": target_id,
+                           "value": item.value};
+         });
+     };
+
+     function subscribe_common(host, query, handler) {
          console.log('subscribing (' + host + ' / ' + query + ') ...');
          var queryString = "query=" + encodeURI(query);
          var uri = "ws://" + host + "/index?subscribe=true&" + queryString;
@@ -83,64 +187,37 @@
              console.log('ws error (' + host + ' / ' + query + ')');
          };
          connection.onmessage = function (message) {
-             // try to decode json (I assume that each message from server is json)
              try {
                  var json = JSON.parse(message.data);
              } catch (e) {
                  console.log('invalid JSON: ', message.data);
                  return;
              };
+             handler(json);
              var item = handler(json);
-             index[item.key] = item;
-             redraw();
+         };
+     };
+
+
+    function to_lists() {
+        var node_list = [];
+        for (var key in nodes) {
+            node_list.push(nodes[key]);
+        };
+        var edge_list = [];
+        for (var key in edges) {
+            edge_list.push(edges[key]);
+        };
+        return {"nodes": node_list, "links": edge_list};
+    };
+
+     function ensure_id(item_key) {
+         if (nodes[item_key] == undefined) {
+             var id = max_id;
+             max_id += 1;
+             nodes[item_key] = {"name": item_key, "id": id};
          };
      };
 
      console.log('looking_glass finished initializing');
  })();
-
-
-//         var host = json.host.split(".")[0];
-//         var service = json.service.split(" ");
-//         var category = service[1];
-//         var metric = json.metric + 1;
-//         var service_type = service[2];
-//         if (json.tags) {
-//             var host_tags = json.tags.join(" ");
-//             var cat_tags = json.tags.filter(is_cluster_tag).join(" ");
-//         } else {
-//             var host_tags = "";
-//             var cat_tags = "";
-//         };
-//         //console.log('dbg: ', host, service, category, metric, service_type);
-//         if (((service_type == "received") && (category != "scribe_overall")) ||
-//             (service_type == "sent")) {
-//             if (nodes[host] == undefined) {
-//                 var id = max_id;
-//                 max_id += 1;
-//                 nodes[host] = {"name": host+" "+host_tags, "id": id};
-//             }
-//             if (nodes[category] == undefined) {
-//                 var id = max_id;
-//                 max_id += 1;
-//                 nodes[category] = {"name": category+" "+cat_tags, "id": id};
-//             }
-//             var host_id = nodes[host].id;
-//             var category_id = nodes[category].id;
-
-//             if (service_type == "received") {
-//                 var key = [category, host];
-//                 edges[key] = {"source": category_id,
-//                               "target": host_id,
-//                               "value": metric};
-//             } else if (service_type == "sent") {
-//                 var key = [host, category];
-//                 edges[key] = {"source": host_id,
-//                               "target": category_id,
-//                               "value": metric};
-//             }
-//         };
-//     };
-// }
-
-
