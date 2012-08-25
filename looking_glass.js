@@ -73,7 +73,7 @@ var path = sankey.link();
 
     var svg_link_g;
     var svg_node_g;
-    var nodes = {};
+    var vertices = {};
     var edges = {};
     var max_id = 0;
 
@@ -89,7 +89,9 @@ var path = sankey.link();
     };
 
     looking_glass.render_flow = function () {
-        var graph = to_lists();
+        var graph = { nodes: _.values(vertices),
+                      links: _.values(edges)
+                     };
 
         sankey
             .nodes(graph.nodes)
@@ -195,8 +197,8 @@ var path = sankey.link();
 
             ensure_id(item.source);
             ensure_id(item.target);
-            var source_id = nodes[item.source].id;
-            var target_id = nodes[item.target].id;
+            var source_id = vertices[item.source].id;
+            var target_id = vertices[item.target].id;
 
             var key = [source_id, target_id];
             //var key = [item.source, item.target];
@@ -208,23 +210,11 @@ var path = sankey.link();
         });
     };
 
-    function to_lists() {
-        var node_list = [];
-        for (var key in nodes) {
-            node_list.push(nodes[key]);
-        };
-        var edge_list = [];
-        for (var key in edges) {
-            edge_list.push(edges[key]);
-        };
-        return {"nodes": node_list, "links": edge_list};
-    };
-
     function ensure_id(item_key) {
-        if (nodes[item_key] == undefined) {
+        if (vertices[item_key] == undefined) {
             var id = max_id;
             max_id += 1;
-            nodes[item_key] = {"name": item_key, "id": id};
+            vertices[item_key] = {"name": item_key, "id": id};
         };
     };
 
