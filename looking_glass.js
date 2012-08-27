@@ -26,7 +26,7 @@ var path = sankey.link();
         var table = chart0.append("table")
             .attr("class", "table")
             .style("width", "300px");
-        thead = table.append("thead")
+        thead = table.append("thead");
         tbody = table.append("tbody");
 
         thead.append("tr")
@@ -42,7 +42,7 @@ var path = sankey.link();
 
         var t = tbody.selectAll("div").data(indexData);
         var rows = tbody.selectAll("tr")
-            .data(indexData)
+            .data(indexData);
         rows.enter().append("tr");
 
         var cells = rows.selectAll("td")
@@ -55,8 +55,8 @@ var path = sankey.link();
         cells.enter().append("td");
         var bars = cells.selectAll("div")
             .data(function(d) { return [d]; });
-        bars.enter().append("div").call(render_div)
-        bars.transition().call(render_div)
+        bars.enter().append("div").call(render_div);
+        bars.transition().call(render_div);
 
         function render_div() {
             this
@@ -101,7 +101,7 @@ var path = sankey.link();
             .layout(32);
 
         var links = svg_link_g.selectAll(".link")
-            .data(graph.links, function(d) { return d.key })
+            .data(graph.links, function(d) { return d.key });
         links.enter().append("path").attr("class", "link").call(render_link);
         links.call(render_link);
         function render_link() {
