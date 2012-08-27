@@ -63,7 +63,9 @@ var path = sankey.link();
                 .text(function(d) { return d.value; })
                 .filter(function(d) { return d.column == 'value'; })
                 .attr("class", "ok")
-                .style("width", function(d) { return d.value * 100 + "px"; });
+                .style("width", function(d) {
+                    return d3.min([d3.max([d.value, 0]), 1]) * 100 + "px";
+                });
         };
 
         cells.exit().remove();
