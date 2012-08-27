@@ -21,11 +21,11 @@
 
   var host = "nisse.lefant.net:5556";
   looking_glass.subscribe(host, 'host =~ "%"', function(event) {
-    var key = event.host + '+' + event.service;
+    //var key = event.host + '+' + event.service;
     //var value = event.state + '+' + event.metric;
-    var value = event.metric;
+    //var value = event.metric;
     //console.log('dev: ', key, value);
-    return { 'key': key, 'value': value };
+    return event;
   });
 
   <!-- setInterval(function() { -->

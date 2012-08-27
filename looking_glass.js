@@ -20,52 +20,69 @@ var path = sankey.link();
     };
 
     var index = {};
-    var tbody;
+    var hosts = {};
+    var services = {};
+    var table;
 
     looking_glass.init = function(chart0) {
-        var table = chart0.append("table")
+        table = chart0.append("table")
             .attr("class", "table")
-            .style("width", "300px");
-        thead = table.append("thead");
-        tbody = table.append("tbody");
+            .style("width", "500px");
 
-        thead.append("tr")
-            .selectAll("th")
-            .data(["key", "metric"])
-            .enter()
-            .append("th")
-            .text(function(column) { return column; });
+        table.append("thead").append("tr").append("th");
+        table.append("tbody");
     };
 
     looking_glass.render = function() {
         var indexData = _.values(index);
+        var hostList = _.keys(hosts).sort();
+        var serviceList = _.keys(services).sort();
 
-        var t = tbody.selectAll("div").data(indexData);
-        var rows = tbody.selectAll("tr")
-            .data(indexData);
+        var thead = table.select("thead").select("tr").select("th");
+        var hcells = thead.selectAll("th")
+            .data(["host"].concat(serviceList), function(id) { return id; });
+        hcells.enter().append("th")
+            .text(function(service) { return service; });
+        hcells
+            .text(function(service) { return service; });
+
+        var rows = table.select("tbody").selectAll("tr")
+            .data(hostList, function(host) { return host; });
         rows.enter().append("tr");
 
         var cells = rows.selectAll("td")
-            .data(function(row) {
-                return ['key', 'value'].map(
-                    function(column) {
-                        return {column: column, value: row[column]};
-                    });
+            .data(function(host) {
+                return [{ metric: host, key: "host" }].concat(
+                    serviceList.map(
+                        function(service) {
+                            if (index[[host, service]] == undefined) {
+                                return { key: [host, service] };
+                            } else {
+                                return index[[host, service]];
+                            };
+                        }));
             });
         cells.enter().append("td");
         var bars = cells.selectAll("div")
-            .data(function(d) { return [d]; });
+            .data(function(d) { return [d]; },
+                  function(d) { return d.key; });
         bars.enter().append("div").call(render_div);
         bars.transition().call(render_div);
 
         function render_div() {
             this
-                .text(function(d) { return d.value; })
-                .filter(function(d) { return d.column == 'value'; })
+                .filter(function(d) { return d.key == "host"; })
+                .text(function(d) { return d.metric; });
+
+            this
+                .filter(function(d) { return d.key != "host"; })
+                .filter(function(d) { return d.metric != undefined; })
+                .text(function(d) { return d3.round(d.metric, 2); })
                 .attr("class", "ok")
                 .style("width", function(d) {
-                    return d3.min([d3.max([d.value, 0]), 1]) * 100 + "px";
+                    return d3.min([d3.max([d.metric, 0]), 1]) * 100 + "px";
                 });
+                //.attr("class", d.state);
         };
 
         cells.exit().remove();
@@ -186,7 +203,23 @@ var path = sankey.link();
     looking_glass.subscribe = function (host, query, handler) {
         subscribe_common(host, query, function(json) {
             var item = handler(json);
+            item["key"] = [item.host, item.service];
             index[item.key] = item;
+            if (hosts[item.host] == undefined) {
+                hosts[item.host] = true;
+            };
+            if (services[item.service] == undefined) {
+                services[item.service] = {
+                    name: item.service,
+                    min: item.metric,
+                    max: item.metric
+                };
+            } else {
+                services[item.service] = {
+                    min: _.min([item.metric, services[item.service].min]),
+                    max: _.max([item.metric, services[item.service].max])
+                };
+            };
         });
     };
 
