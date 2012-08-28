@@ -41,7 +41,7 @@ var path = sankey.link();
         var thead = table.select("thead").select("tr").select("th");
         var hcells = thead.selectAll("th")
             .data(["host"].concat(serviceList), function(id) { return id; });
-        hcells.enter().append("th")
+        hcells.enter().append("th").style("width", "100px")
             .text(function(service) { return service; });
         hcells
             .text(function(service) { return service; });
@@ -62,7 +62,7 @@ var path = sankey.link();
                             };
                         }));
             });
-        cells.enter().append("td");
+        cells.enter().append("td").style("width", "100px");
         var bars = cells.selectAll("div")
             .data(function(d) { return [d]; },
                   function(d) { return d.key; });
