@@ -29,7 +29,7 @@ var path = sankey.link();
             .attr("class", "table")
             .style("width", "500px");
 
-        table.append("thead").append("tr").append("th");
+        table.append("thead").append("tr");
         table.append("tbody");
     };
 
@@ -38,51 +38,45 @@ var path = sankey.link();
         var hostList = _.keys(hosts).sort();
         var serviceList = _.keys(services).sort();
 
-        var thead = table.select("thead").select("tr").select("th");
+        var thead = table.select("thead").select("tr");
         var hcells = thead.selectAll("th")
             .data(["host"].concat(serviceList), function(id) { return id; });
-        hcells.enter().append("th").style("width", "100px")
+        hcells.enter().append("th")
             .text(function(service) { return service; });
         hcells
             .text(function(service) { return service; });
 
         var rows = table.select("tbody").selectAll("tr")
             .data(hostList, function(host) { return host; });
-        rows.enter().append("tr");
+        rows.enter().append("tr").append("th").text(function(d) { return d; });
 
         var cells = rows.selectAll("td")
             .data(function(host) {
-                return [{ metric: host, key: "host" }].concat(
-                    serviceList.map(
-                        function(service) {
-                            if (index[[host, service]] == undefined) {
-                                return { key: [host, service] };
-                            } else {
-                                return index[[host, service]];
-                            };
-                        }));
+                return serviceList.map(
+                    function(service) {
+                        if (index[[host, service]] == undefined) {
+                            return { key: [host, service] };
+                        } else {
+                            return index[[host, service]];
+                        };
+                    });
             });
-        cells.enter().append("td").style("width", "100px");
+        cells.enter().append("td");
         var bars = cells.selectAll("div")
             .data(function(d) { return [d]; },
                   function(d) { return d.key; });
         bars.enter().append("div").call(render_div);
-        bars.transition().call(render_div);
+        bars.call(render_div);
 
         function render_div() {
             this
-                .filter(function(d) { return d.key == "host"; })
-                .text(function(d) { return d.metric; });
-
-            this
-                .filter(function(d) { return d.key != "host"; })
                 .filter(function(d) { return d.metric != undefined; })
                 .text(function(d) { return d3.round(d.metric, 2); })
-                .attr("class", "ok")
+                //.attr("class", "ok")
+                .attr("class", function(d) { return d.state; })
                 .style("width", function(d) {
-                    return d3.min([d3.max([d.metric, 0]), 1]) * 100 + "px";
+                    return d3.min([d3.max([d.metric, 0]), 1]) * 100 + "%";
                 });
-                //.attr("class", d.state);
         };
 
         cells.exit().remove();
