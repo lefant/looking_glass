@@ -216,16 +216,7 @@ var path = sankey.link();
                 hosts[item.host] = true;
             };
             if (services[item.service] == undefined) {
-                services[item.service] = {
-                    name: item.service,
-                    min: item.metric,
-                    max: item.metric
-                };
-            } else {
-                services[item.service] = {
-                    min: _.min([item.metric, services[item.service].min]),
-                    max: _.max([item.metric, services[item.service].max])
-                };
+                services[item.service] = true;
             };
         });
     };
