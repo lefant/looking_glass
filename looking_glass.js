@@ -34,9 +34,22 @@ var path = sankey.link();
     };
 
     looking_glass.render = function() {
-        var indexData = _.values(index);
         var hostList = _.keys(hosts).sort();
         var serviceList = _.keys(services).sort();
+
+        var serviceScales = {};
+        serviceList.forEach(
+            function(service) {
+                var serviceValues = hostList.map(
+                    function(host) {
+                        return index[[host, service]];
+                    }).filter(function(d) { return d != undefined; })
+                    .map(function(d) { return d.metric; })
+                    .concat([0.0001]);
+                serviceScales[service] = d3.scale.linear()
+                    .domain(d3.extent(serviceValues))
+                    .range(["0%", "100%"]);
+            });
 
         var thead = table.select("thead").select("tr");
         var hcells = thead.selectAll("th")
@@ -72,10 +85,10 @@ var path = sankey.link();
             this
                 .filter(function(d) { return d.metric != undefined; })
                 .text(function(d) { return d3.round(d.metric, 2); })
-                //.attr("class", "ok")
                 .attr("class", function(d) { return d.state; })
                 .style("width", function(d) {
-                    return d3.min([d3.max([d.metric, 0]), 1]) * 100 + "%";
+                           var x = serviceScales[d.service];
+                           return x(d3.max([0.0001, d.metric]));
                 });
         };
 
