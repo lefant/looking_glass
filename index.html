@@ -1,30 +1,13 @@
 <html>
   <head>
-    <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script> -->
-    <script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
-    <script src="sankey.js"></script>
-    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <script data-main="js/main" src="js/require.js"></script>
   </head>
   <title>Riemann Looking-glass</title>
   <body>
     <div id="content">
-      <h1>Looking glass</h1>
+      <h1>Through the Riemann looking-glass</h1>
       <p id="chart">
     </div>
   </body>
 </html>
-<script type="text/javascript" src="looking_glass.js?1"></script>
 <link href="style.css" rel="stylesheet" type="text/css"></link>
-<script>
-  looking_glass.init(d3.select("#chart"));
-  //looking_glass.init_flow(d3.select("#chart"));
-
-  var host = "nisse.lefant.net:5556";
-  looking_glass.subscribe(host, 'host =~ "%"', function(event) {
-    return event;
-  });
-
-  setInterval(function() {
-    looking_glass.render();
-  }, 500);
-</script>
