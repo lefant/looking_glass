@@ -21,13 +21,14 @@ require.config({
     }
 });
 
-require(['d3', 'looking_glass'],
-        function (d3, looking_glass) {
+require(['d3', 'looking_glass', 'main_config'],
+        function (d3, looking_glass, main_config) {
             looking_glass.init(d3.select("#chart"));
             //looking_glass.init_flow(d3.select("#chart"));
 
-            var host = "nisse.lefant.net:5556";
-            looking_glass.subscribe(host, 'host =~ "%"', function(event) {
+            looking_glass.subscribe(main_config.host,
+                                    main_config.filter,
+                                    function(event) {
                                         return event;
                                     });
 
