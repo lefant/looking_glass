@@ -208,7 +208,6 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                        console.log('invalid JSON: ', message.data);
                        return;
                    };
-                   handler(json);
                    var item = handler(json);
                };
            };
