@@ -64,7 +64,8 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                var rows = table.select("tbody").selectAll("tr")
                    .data(hostList, function(host) { return host; })
                    .sort();
-               rows.enter().append("tr").append("th").text(function(d) { return d; });
+               rows.enter().append("tr").append("th")
+                   .text(function(d) { return d; });
 
                var cells = rows.selectAll("td")
                    .data(function(host) {
