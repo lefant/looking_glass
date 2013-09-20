@@ -60,6 +60,8 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                    .text(function(service) { return service; });
                hcells
                    .text(function(service) { return service; });
+               hcells.exit().remove();
+
 
                var rows = table.select("tbody").selectAll("tr")
                    .data(hostList, function(host) { return host; })
