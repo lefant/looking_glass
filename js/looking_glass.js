@@ -70,13 +70,24 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                var headrow = table.select("thead").select("tr");
                var hcells = headrow.selectAll("th")
                    .data(["host"]
-                         .concat(serviceList), function(id) { return id; });
+                         .concat(serviceList), function(id) { return id; })
+                   .sort(header_sort);
                hcells.enter().append("th")
                    .text(function(service) { return service; });
                hcells
                    .text(function(service) { return service; });
                hcells.exit().remove();
 
+               function header_sort(a, b) {
+                   if (a == "host") {
+                       return -1;
+                   } else if (a > b) {
+                       return 1;
+                   } else if (a < b) {
+                       return -1;
+                   } else {
+                       return 0;
+                   }};
 
                var rows = table.select("tbody").selectAll("tr")
                    .data(hostList, function(host) { return host; })
