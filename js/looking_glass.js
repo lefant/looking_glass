@@ -20,12 +20,13 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                version: "0.0.1"
            };
 
-           var index = {};
-           var hosts = {};
-           var services = {};
-           var table;
+           var index, hosts, services, table;
 
            looking_glass.init = function(chart0) {
+               index = {};
+               hosts = {};
+               services = {};
+
                table = chart0.append("table")
                    .attr("class", "table")
                    .style("width", "500px");
