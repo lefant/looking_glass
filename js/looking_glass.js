@@ -211,42 +211,43 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                    };
                    var item = handler(json);
                };
+               return connection;
            };
 
            looking_glass.subscribe = function (host, query, handler) {
-               subscribe_common(host, query, function(json) {
-                                    var item = handler(json);
-                                    item["key"] = [item.host, item.service];
-                                    index[item.key] = item;
-                                    if (hosts[item.host] == undefined) {
-                                        hosts[item.host] = true;
-                                    };
-                                    if (services[item.service] == undefined) {
-                                        services[item.service] = true;
-                                    };
-                                });
+               return subscribe_common(host, query, function(json) {
+                   var item = handler(json);
+                   item["key"] = [item.host, item.service];
+                   index[item.key] = item;
+                   if (hosts[item.host] == undefined) {
+                       hosts[item.host] = true;
+                   };
+                   if (services[item.service] == undefined) {
+                       services[item.service] = true;
+                   };
+               });
            };
 
            looking_glass.subscribe_flow = function (host, query, handler) {
-               subscribe_common(host, query, function(json) {
-                                    var item = handler(json);
-                                    if (! item) {
-                                        return;
-                                    };
+               return subscribe_common(host, query, function(json) {
+                   var item = handler(json);
+                   if (! item) {
+                       return;
+                   };
 
-                                    ensure_id(item.source);
-                                    ensure_id(item.target);
-                                    var source_id = vertices[item.source].id;
-                                    var target_id = vertices[item.target].id;
+                   ensure_id(item.source);
+                   ensure_id(item.target);
+                   var source_id = vertices[item.source].id;
+                   var target_id = vertices[item.target].id;
 
-                                    var key = [source_id, target_id];
-                                    //var key = [item.source, item.target];
-                                    edges[key] = {
-                                        "key": key,
-                                        "source": source_id,
-                                        "target": target_id,
-                                        "value": item.value};
-                                });
+                   var key = [source_id, target_id];
+                   //var key = [item.source, item.target];
+                   edges[key] = {
+                       "key": key,
+                       "source": source_id,
+                       "target": target_id,
+                       "value": item.value};
+               });
            };
 
            function ensure_id(item_key) {
