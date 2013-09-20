@@ -20,7 +20,7 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                version: "0.0.1"
            };
 
-           var index, hosts, services, table;
+           var ws, index, hosts, services, table;
 
            looking_glass.init = function(chart0) {
                index = {};
@@ -36,6 +36,8 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
            };
 
            looking_glass.cleanup = function() {
+               ws.close();
+
                var headrow = table.select("thead").select("tr")
                headrow.select("th").remove();
                headrow.remove();
@@ -240,11 +242,11 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                    };
                    var item = handler(json);
                };
-               return connection;
+               ws = connection;
            };
 
            looking_glass.subscribe = function (host, query, handler) {
-               return subscribe_common(host, query, function(json) {
+               subscribe_common(host, query, function(json) {
                    var item = handler(json);
                    item["key"] = [item.host, item.service];
                    index[item.key] = item;
@@ -258,7 +260,7 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
            };
 
            looking_glass.subscribe_flow = function (host, query, handler) {
-               return subscribe_common(host, query, function(json) {
+               subscribe_common(host, query, function(json) {
                    var item = handler(json);
                    if (! item) {
                        return;
