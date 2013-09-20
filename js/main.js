@@ -32,7 +32,6 @@ require(['jquery', 'sammy', 'd3', 'looking_glass', 'main_config'],
         function (jquery, sammy, d3, looking_glass, main_config) {
             var app = sammy(function() {
                 this.get('#/', function() {
-                    alert("root");
                     this.redirect('#/filter/crtt');
                 });
 
