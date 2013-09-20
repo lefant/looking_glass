@@ -29,6 +29,9 @@ require(['d3', 'looking_glass', 'main_config'],
             looking_glass.subscribe(main_config.host,
                                     main_config.filter,
                                     function(event) {
+                                        event.host =
+                                            event.instance_role + ' ' +
+                                            event.host.split('.')[0];
                                         return event;
                                     });
 
