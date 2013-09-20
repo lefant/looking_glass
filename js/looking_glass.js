@@ -34,6 +34,20 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                table.append("tbody");
            };
 
+           looking_glass.cleanup = function() {
+               var headrow = table.select("thead").select("tr")
+               headrow.select("th").remove();
+               headrow.remove();
+
+               var rows = table.select("tbody").selectAll("tr");
+               var cells = rows.selectAll("td")
+               cells.selectAll("div").remove()
+               cells.remove();
+               rows.remove();
+
+               table.remove();
+           };
+
            looking_glass.render = function() {
                var hostList = _.keys(hosts).sort();
                var serviceList = _.keys(services).sort();
