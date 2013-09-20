@@ -67,8 +67,8 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
                            .range(["0%", "100%"]);
                    });
 
-               var thead = table.select("thead").select("tr");
-               var hcells = thead.selectAll("th")
+               var headrow = table.select("thead").select("tr");
+               var hcells = headrow.selectAll("th")
                    .data(["host"]
                          .concat(serviceList), function(id) { return id; });
                hcells.enter().append("th")
