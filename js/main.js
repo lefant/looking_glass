@@ -14,36 +14,51 @@ require.config({
             exports: function (d3) {
                 return d3.sankey;
             }
+        },
+        sammy: {
+            exports: 'sammy'
+        },
+        jquery: {
+            exports: 'jquery'
         }
     },
     paths: {
-        d3: 'd3.v2'
+        d3: 'd3.v2',
+        jquery: 'jquery-2.0.3',
     }
 });
 
-require(['d3', 'looking_glass', 'main_config'],
-        function (d3, looking_glass, main_config) {
-            looking_glass.init(d3.select("#chart"));
-            //looking_glass.init_flow(d3.select("#chart"));
+require(['jquery', 'sammy', 'd3', 'looking_glass', 'main_config'],
+        function (jquery, sammy, d3, looking_glass, main_config) {
+            var app = sammy(function() {
+                this.get('#/', function() {
+                    alert("root");
+                    this.redirect('#/filter/crtt');
+                });
 
-            looking_glass.subscribe(main_config.host,
-                                    main_config.filter,
-                                    function(event) {
-                                        event.host =
-                                            event.instance_role + ' ' +
-                                            event.host.split('.')[0];
-                                        return event;
-                                    });
+                this.get('#/filter/:filter_id', function(context) {
+                    var id = this.params['filter_id'];
+                    console.log('selected filter: ', id);
+                    try { looking_glass.cleanup(); } catch(err) {
+                        console.log('cleanup error: ', err);
+                    };
 
-            setInterval(function() {
-                            looking_glass.render();
-                        }, 500);
+                    looking_glass.init(d3.select("#chart"));
+
+                    var filter_string = main_config.filters[id],
+                    ws = looking_glass.subscribe(main_config.host,
+                                                 filter_string,
+                                                 function(event) {
+                                                     event.host =
+                                                         event.instance_role + ' ' +
+                                                         event.host.split('.')[0];
+                                                     return event;
+                                                 });
+
+                    setInterval(function() {
+                        looking_glass.render();
+                    }, 500);
+                });
+            });
+            app.run();
         });
-
-// require(['viewModelBase', 'bindingHandlers', 'Knockout'], function (ViewModelBase, BindingHandlers, ko) {
-//     BindingHandlers.init();
-
-//     var viewModelBase = new ViewModelBase();
-//     ko.applyBindings(viewModelBase);
-//     viewModelBase.initialize();
-// });
