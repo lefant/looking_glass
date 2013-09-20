@@ -29,7 +29,7 @@ define(['d3', 'sankey', 'underscore'], function(d3, d3_sankey, _) {
 
                table = chart0.append("table")
                    .attr("class", "table")
-                   .style("width", "500px");
+                   .style("width", "1000px");
 
                table.append("thead").append("tr");
                table.append("tbody");
