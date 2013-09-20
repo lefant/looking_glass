@@ -1,0 +1,8 @@
+
+GET STARTED
+-----------
+
+cd js
+ln -s main_config_localhost.js main_config.js
+
+sh ../support/r.sh
