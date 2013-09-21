@@ -57,26 +57,19 @@ require(['jquery', 'sammy', 'd3', 'looking_glass', 'main_config'],
 
                 this.get('#/filter/:filter_id', function(context) {
                     var id = this.params['filter_id'];
-                    console.log('selected filter: ', id);
-                    try { looking_glass.cleanup(); } catch(err) {
-                        console.log('cleanup error: ', err);
-                    };
+                    var filter_string = main_config.filters[id];
+                    this.redirect('#/customfilter', encodeURI(filter_string));
+                });
 
-                    looking_glass.init(d3.select("#chart"));
+                this.put('#/customfilter', function(context) {
+                    var filter_string = this.params['filter_string'];
+                    this.redirect('#/customfilter', encodeURI(filter_string));
+                });
 
-                    var filter_string = main_config.filters[id],
-                    ws = looking_glass.subscribe(main_config.host,
-                                                 filter_string,
-                                                 function(event) {
-                                                     event.host =
-                                                         event.instance_role + ' ' +
-                                                         event.host.split('.')[0];
-                                                     return event;
-                                                 });
-
-                    setInterval(function() {
-                        looking_glass.render();
-                    }, 500);
+                this.get('#/customfilter/:filter_string', function(context) {
+                    var filter_string = this.params['filter_string'];
+                    $('#filter_string').val(filter_string);
+                    looking_glass_reinit(filter_string);
                 });
             });
             app.run();
