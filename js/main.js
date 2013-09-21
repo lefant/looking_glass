@@ -30,6 +30,26 @@ require.config({
 
 require(['jquery', 'sammy', 'd3', 'looking_glass', 'main_config'],
         function (jquery, sammy, d3, looking_glass, main_config) {
+            function looking_glass_reinit(filter_string) {
+                try { looking_glass.cleanup(); } catch(err) {
+                    console.log('cleanup error: ', err);
+                };
+
+                looking_glass.init(d3.select("#chart"));
+                looking_glass.subscribe(main_config.host,
+                                        filter_string,
+                                        function(event) {
+                                            event.host =
+                                                event.instance_role + ' ' +
+                                                event.host.split('.')[0];
+                                            return event;
+                                        });
+
+                setInterval(function() {
+                    looking_glass.render();
+                }, 500);
+            };
+
             var app = sammy(function() {
                 this.get('#/', function() {
                     this.redirect('#/filter/crtt');
