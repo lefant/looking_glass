@@ -13,6 +13,17 @@
       <a href="index.html#/filter/scribe_bulker">scribe_bulker</a>
       <a href="index.html#/filter/basic_vpc">basic_vpc</a>
       <a href="index.html#/filter/zookeeper">zookeeper</a>
+
+      <form action="#/customfilter" method="put">
+        <label>custom filter:</label>
+        <input id="filter_string"
+               type="text"
+               size="150"
+               name="filter_string"
+               value="host =~ &quot;%&quot;" />
+        <input type="submit" value="apply filter" />
+      </form>
+
       <p id="chart">
     </div>
   </body>
