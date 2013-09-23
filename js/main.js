@@ -58,12 +58,14 @@ require(['jquery', 'sammy', 'd3', 'looking_glass', 'main_config'],
                 this.get('#/filter/:filter_id', function(context) {
                     var id = this.params['filter_id'];
                     var filter_string = main_config.filters[id];
-                    this.redirect('#/customfilter', encodeURI(filter_string));
+                    this.redirect('#/customfilter',
+                                  encodeURIComponent(filter_string));
                 });
 
                 this.put('#/customfilter', function(context) {
                     var filter_string = this.params['filter_string'];
-                    this.redirect('#/customfilter', encodeURI(filter_string));
+                    this.redirect('#/customfilter',
+                                  encodeURIComponent(filter_string));
                 });
 
                 this.get('#/customfilter/:filter_string', function(context) {
